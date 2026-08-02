@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>AutoGrade Lab — Advanced Demo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Dark Theme (Default) */
+    --bg: #0b0d13;
+    --panel: #141722;
+    --panel-header: #1b2030;
+    --border: #242b3d;
+    --border-hover: #3b4560;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --accent: #4f46e5;
+    --accent-light: #6366f1;
+    --good: #10b981;
+    --bad: #ef4444;
+    --warning: #f59e0b;
+    --input-bg: #090b10;
+    --shadow: rgba(0, 0, 0, 0.25);
+  }
+
+  body.light-theme {
+    /* Light Theme */
+    --bg: #f8fafc;
+    --panel: #ffffff;
+    --panel-header: #f1f5f9;
+    --border: #e2e8f0;
+    --border-hover: #cbd5e1;
+    --text: #0f172a;
+    --muted: #64748b;
+    --accent: #4f46e5;
+    --accent-light: #4f46e5;
+    --good: #059669;
+    --bad: #dc2626;
+    --warning: #d97706;
+    --input-bg: #f8fafc;
+    --shadow: rgba(0, 0, 0, 0.05);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  header {
+    background: linear-gradient(135deg, var(--panel-header) 0%, var(--panel) 100%);
+    padding: 20px 32px;
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 4px 20px var(--shadow);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.3s, border-color 0.3s;
+  }
+  .header-info h1 {
+    font-size: 22px;
+    font-weight: 800;
+    background: linear-gradient(90deg, var(--text) 0%, var(--accent-light) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .header-info p {
+    margin-top: 4px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .demo-tag {
+    background: rgba(99,102,241,0.1);
+    color: var(--accent-light);
+    border: 1px solid rgba(99,102,241,0.2);
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .theme-toggle {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s;
+    padding: 0;
+  }
+  .theme-toggle:hover {
+    border-color: var(--border-hover);
+    background: rgba(255, 255, 255, 0.05);
+  }
+  body.light-theme .theme-toggle:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
+  main {
+    max-width: 1600px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 24px 32px;
+    display: flex;
+    gap: 24px;
+    flex-grow: 1;
+  }
+
+  /* Sidebar Navigation (CMS-style) */
+  .sidebar {
+    width: 260px;
+    min-width: 260px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px var(--shadow);
+    align-self: flex-start;
+    position: sticky;
+    top: 24px;
+    transition: background-color 0.3s, border-color 0.3s;
+  }
+  .sidebar-item {
+    padding: 11px 18px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--accent-light);
+    cursor: pointer;
+    transition: background-color 0.15s, color 0.15s;
+    border-left: 4px solid transparent;
+    text-decoration: none;
+    display: block;
+  }
+  .sidebar-item:hover {
+    background: rgba(99, 102, 241, 0.06);
+  }
+  .sidebar-item.active {
+    background: var(--accent-light);
+    color: #fff;
+    font-weight: 600;
+    border-left-color: var(--accent);
+  }
+  .sidebar-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 4px 0;
+  }
+  .sidebar-section {
+    padding: 10px 18px 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    cursor: default;
+  }
+  .sidebar-sub {
+    padding: 7px 18px 7px 30px;
+    font-size: 12.5px;
+    color: var(--accent-light);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background-color 0.15s;
+  }
+  .sidebar-sub:hover {
+    background: rgba(99, 102, 241, 0.06);
+  }
+  .sidebar-sub.active {
+    background: rgba(99, 102, 241, 0.12);
+    font-weight: 600;
+  }
+
+  /* Content area beside sidebar */
+  .content-area {
+    flex: 1;
+    min-width: 0;
+    display: grid;
+    gap: 24px;
+    grid-template-columns: 1.25fr 1fr;
+    align-content: start;
+  }
+  .content-area .history-panel { grid-column: span 2; }
+  .content-area .overview-panel { grid-column: span 2; }
+
+  /* View sections */
+  .view-section { display: none; }
+  .view-section.active { display: contents; }
+
+  @media (max-width: 1200px) {
+    .content-area { grid-template-columns: 1fr; }
+    .content-area .history-panel { grid-column: span 1; }
+    .content-area .overview-panel { grid-column: span 1; }
+  }
+  @media (max-width: 900px) {
+    main { flex-direction: column; }
+    .sidebar { width: 100%; min-width: unset; position: static; flex-direction: row; flex-wrap: wrap; }
+    .sidebar-item, .sidebar-sub { padding: 8px 12px; }
+    .sidebar-section { padding: 8px 12px 2px; }
+  }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 8px 30px var(--shadow);
+    transition: background-color 0.3s, border-color 0.3s;
+  }
+  .panel-head {
+    background: var(--panel-header);
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--text);
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    transition: background-color 0.3s, border-color 0.3s;
+  }
+  .panel-body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    flex-grow: 1;
+  }
+  label {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  select, input, textarea {
+    width: 100%;
+    background: var(--input-bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.2s, background-color 0.3s, color 0.3s;
+  }
+  select:focus, input:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent-light);
+  }
+  optgroup {
+    background: var(--panel);
+    color: var(--text);
+    font-weight: 700;
+    font-style: normal;
+  }
+  textarea {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    min-height: 380px;
+    resize: vertical;
+    line-height: 1.5;
+  }
+  button {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+  button:hover {
+    opacity: 0.9;
+  }
+  button:active {
+    transform: scale(0.98);
+  }
+  button:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+    transform: none;
+  }
+  .problem {
+    font-size: 13.5px;
+    color: var(--text);
+    opacity: 0.95;
+    white-space: pre-wrap;
+    line-height: 1.6;
+    background: var(--input-bg);
+    padding: 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    transition: background-color 0.3s, border-color 0.3s;
+  }
+  .score-box {
+    text-align: center;
+    padding: 20px;
+    background: var(--input-bg);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    margin-bottom: 12px;
+    transition: background-color 0.3s, border-color 0.3s;
+  }
+  .score {
+    font-size: 40px;
+    font-weight: 800;
+  }
+  .score.good { color: var(--good); }
+  .score.bad { color: var(--bad); }
+  .testcase {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 13px;
+    transition: background-color 0.2s, border-color 0.3s;
+  }
+  .testcase:hover {
+    background-color: rgba(255,255,255,0.02);
+  }
+  body.light-theme .testcase:hover {
+    background-color: rgba(0,0,0,0.01);
+  }
+  .testcase.pass { border-left: 4px solid var(--good); }
+  .testcase.fail { border-left: 4px solid var(--bad); }
+  .tc-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+  }
+  .tc-detail {
+    margin-top: 8px;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    white-space: pre-wrap;
+    background: var(--input-bg);
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    transition: background-color 0.3s, border-color 0.3s;
+  }
+  .badge {
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  .badge.pass { background: rgba(16,185,129,0.15); color: var(--good); }
+  .badge.fail { background: rgba(239,68,68,0.15); color: var(--bad); }
+  
+  .feedback-block {
+    margin-top: 16px;
+    padding: 16px;
+    background: rgba(99,102,241,0.04);
+    border: 1px solid rgba(99,102,241,0.15);
+    border-radius: 10px;
+  }
+  .feedback-block h3 {
+    font-size: 13px;
+    color: var(--accent-light);
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .feedback-block p {
+    font-size: 13px;
+    line-height: 1.6;
+    margin-bottom: 8px;
+  }
+  .mock-tag {
+    font-size: 10px;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 2px 8px;
+    border-radius: 6px;
+  }
+  .empty {
+    color: var(--muted);
+    font-size: 13.5px;
+    text-align: center;
+    padding: 40px 20px;
+  }
+  #status {
+    color: var(--warning);
+    font-size: 13px;
+    font-weight: 500;
+  }
+  
+  /* Submissions list */
+  .sub-item {
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    transition: border-color 0.2s, background-color 0.3s;
+  }
+  .sub-item:hover {
+    border-color: var(--border-hover);
+  }
+  .sub-meta {
+    display: flex;
+    justify-content: space-between;
+    color: var(--muted);
+  }
+  .sub-score {
+    font-weight: 700;
+  }
+  .sub-score.pass { color: var(--good); }
+  .sub-score.fail { color: var(--bad); }
+
+  .theme-icon {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* Overview Table Styles */
+  .overview-table th {
+    font-weight: 700;
+  }
+  .overview-table tr.task-row {
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  .overview-table tr.task-row:hover {
+    background-color: rgba(99, 102, 241, 0.08);
+  }
+  .overview-table tr.task-row.active-task {
+    background-color: rgba(99, 102, 241, 0.15);
+    border-left: 4px solid var(--accent-light);
+  }
+  .overview-table td {
+    padding: 10px 12px;
+  }
+  .score-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    text-align: center;
+  }
+  .score-badge.zero {
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--bad);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+  }
+  .score-badge.partial {
+    background: rgba(245, 158, 11, 0.15);
+    color: var(--warning);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+  }
+  .score-badge.full {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--good);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="header-info">
+    <h1>AutoGrade Lab — Advanced Demo</h1>
+    <p>953100 Computers and Programming 1 · CAMT-CMU · Interactive Multi-Lab Auto-Grader</p>
+  </div>
+  <div class="header-actions">
+    <div class="demo-tag">Instructor Dashboard Mode</div>
+    <button class="theme-toggle" id="themeToggle" title="Toggle Light/Dark Mode">
+      <!-- Dark icon (moon) as default -->
+      <svg class="theme-icon" id="themeIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+      </svg>
+    </button>
+  </div>
+</header>
+<main>
+  <!-- CMS-Style Sidebar Navigation -->
+  <nav class="sidebar" id="sidebar">
+    <!-- Time Display Header (CMS style) -->
+    <div class="sidebar-time-header" style="padding: 16px; border-bottom: 1px solid var(--border); background: rgba(99, 102, 241, 0.03); text-align: left; line-height: 1.6; font-size: 13.5px;">
+      <div style="color: var(--muted); font-weight: 500;">
+        Server time: <strong id="sidebarServerTime" style="color: var(--text); font-family: 'JetBrains Mono', monospace; font-weight: 700; margin-left: 4px;">--:--:--</strong>
+      </div>
+      <div style="color: var(--muted); font-weight: 500; margin-top: 4px;">
+        Time left: <strong id="sidebarTimeLeft" style="color: var(--text); font-family: 'JetBrains Mono', monospace; font-weight: 700; margin-left: 4px;">--:--:--</strong>
+      </div>
+    </div>
+
+    <div class="sidebar-item active" data-view="overview" onclick="switchView('overview')">
+      Overview
+    </div>
+    <div class="sidebar-item" data-view="communication" onclick="switchView('communication')">
+      Communication
+    </div>
+    <div class="sidebar-divider"></div>
+    <!-- Task groups will be populated by JS -->
+    <div id="sidebarTasks"></div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-item" data-view="documentation" onclick="switchView('documentation')">
+      Documentation
+    </div>
+    <div class="sidebar-item" data-view="testing" onclick="switchView('testing')">
+      Testing
+    </div>
+  </nav>
+
+  <!-- Content Area -->
+  <div class="content-area">
+
+    <!-- VIEW: Overview -->
+    <div class="view-section active" id="view-overview">
+      <!-- Task Overview Panel -->
+      <section class="panel overview-panel" style="grid-column: 1 / -1;">
+        <div class="panel-head" style="display: flex; justify-content: space-between; align-items: center;">
+          <span>📋 Task Overview & Status</span>
+          <span style="font-size: 11px; text-transform: none; opacity: 0.8; font-weight: 500;">Click any row to select task</span>
+        </div>
+        <div class="panel-body" style="padding: 16px; overflow-x: auto;">
+          <table class="overview-table" style="width: 100%; border-collapse: collapse; font-size: 13px; text-align: left;">
+            <thead>
+              <tr style="border-bottom: 1px solid var(--border); color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;">
+                <th style="padding: 8px 12px; width: 100px;">Score</th>
+                <th style="padding: 8px 12px; width: 150px;">Task ID</th>
+                <th style="padding: 8px 12px;">Task Name</th>
+                <th style="padding: 8px 12px; width: 100px;">Time Limit</th>
+                <th style="padding: 8px 12px; width: 110px;">Memory Limit</th>
+                <th style="padding: 8px 12px; width: 80px;">Type</th>
+                <th style="padding: 8px 12px; width: 110px;">Files</th>
+              </tr>
+            </thead>
+            <tbody id="overviewTableBody">
+              <!-- Populated by JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <!-- VIEW: Statement (per task) -->
+    <div class="view-section" id="view-statement">
+      <section class="panel" style="grid-column: 1 / -1;">
+        <div class="panel-head" id="statementPanelHead">📄 Task Statement</div>
+        <div class="panel-body" id="statementBody">
+          <div class="empty">Select a task from the sidebar to view its statement.</div>
+        </div>
+      </section>
+    </div>
+
+    <!-- VIEW: Submissions (per task) -->
+    <div class="view-section" id="view-submissions">
+      <!-- Submit Panel -->
+      <section class="panel">
+        <div class="panel-head">Submit Code</div>
+        <div class="panel-body">
+          <div>
+            <label for="assignment">Choose Assignment / Checkpoint</label>
+            <select id="assignment" style="margin-top: 6px;"></select>
+          </div>
+
+          <div class="timer-box" style="display: flex; align-items: center; justify-content: space-between; background: rgba(99,102,241,0.08); border: 1px solid rgba(99,102,241,0.2); border-radius: 8px; padding: 10px 14px; margin-top: 4px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 16px;">⏱️</span>
+              <span style="font-weight: 600; font-size: 13px; color: var(--text);">Time left:</span>
+            </div>
+            <div id="countdownTimer" style="font-family: 'JetBrains Mono', monospace; font-size: 16px; font-weight: 800; color: var(--accent-light);">
+              --:--:--
+            </div>
+          </div>
+          
+          <div class="problem" id="problem"></div>
+
+          <div>
+            <label for="studentId">Student ID</label>
+            <input id="studentId" value="662115099" style="margin-top: 6px;" />
+          </div>
+
+          <div style="display: flex; flex-direction: column; flex-grow: 1;">
+            <label for="code">Java Source Code</label>
+            <textarea id="code" spellcheck="false" style="margin-top: 6px; flex-grow: 1;"></textarea>
+          </div>
+
+          <button id="submitBtn">Submit for Grading</button>
+          <div id="status"></div>
+        </div>
+      </section>
+
+      <!-- Results Panel -->
+      <section class="panel">
+        <div class="panel-head">Grading Results</div>
+        <div class="panel-body" id="results-body">
+          <div id="results" class="empty">Submit code to see grading results and AI feedback here.</div>
+        </div>
+      </section>
+    </div>
+
+    <!-- VIEW: Communication -->
+    <div class="view-section" id="view-communication">
+      <section class="panel" style="grid-column: 1 / -1;">
+        <div class="panel-head">💬 Communication — Questions</div>
+        <div class="panel-body">
+          <div>
+            <label for="commSubject">Subject</label>
+            <input id="commSubject" placeholder="Enter your question subject..." style="margin-top: 6px;" />
+          </div>
+          <div>
+            <label for="commText">Text</label>
+            <textarea id="commText" rows="6" placeholder="Describe your question in detail..." style="margin-top: 6px; min-height: 120px;"></textarea>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <button style="flex: 0;" onclick="alert('Question submitted (demo)');">Ask Question</button>
+            <button style="flex: 0; background: var(--panel-header); color: var(--muted);" onclick="document.getElementById('commSubject').value=''; document.getElementById('commText').value='';">Reset</button>
+          </div>
+          <div class="empty" style="padding: 20px;">No announcements or replies yet.</div>
+        </div>
+      </section>
+    </div>
+
+    <!-- VIEW: Documentation -->
+    <div class="view-section" id="view-documentation">
+      <section class="panel" style="grid-column: 1 / -1;">
+        <div class="panel-head">📚 Documentation</div>
+        <div class="panel-body">
+          <div class="empty">Documentation pages will be available here.<br>This is a demo placeholder.</div>
+        </div>
+      </section>
+    </div>
+
+    <!-- VIEW: Testing -->
+    <div class="view-section" id="view-testing">
+      <section class="panel" style="grid-column: 1 / -1;">
+        <div class="panel-head">🧪 Testing</div>
+        <div class="panel-body">
+          <div class="empty">Testing tools will be available here.<br>This is a demo placeholder.</div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Submissions History (always visible at bottom) -->
+    <section class="panel history-panel">
+      <div class="panel-head" style="display: flex; justify-content: space-between; align-items: center;">
+        <span>Submissions History</span>
+        <button id="refreshHistory" style="padding: 4px 10px; font-size: 11px;">Refresh</button>
+      </div>
+      <div class="panel-body" id="history-list" style="overflow-y: auto; max-height: 700px; gap: 10px;">
+        <div class="empty">No submissions logged yet.</div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script>
+const assignmentSelect = document.getElementById('assignment');
+const problemDiv = document.getElementById('problem');
+const codeArea = document.getElementById('code');
+const resultsDiv = document.getElementById('results');
+const statusDiv = document.getElementById('status');
+const submitBtn = document.getElementById('submitBtn');
+const historyList = document.getElementById('history-list');
+const refreshBtn = document.getElementById('refreshHistory');
+const themeToggle = document.getElementById('themeToggle');
+const themeIcon = document.getElementById('themeIcon');
+
+let assignmentsData = [];
+
+// ─── Sidebar Navigation ───
+function switchView(viewName) {
+  // Hide all view sections
+  document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+  // Show the target view
+  const target = document.getElementById('view-' + viewName);
+  if (target) target.classList.add('active');
+  // Update sidebar active states (top-level items only)
+  document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+  const activeItem = document.querySelector(`.sidebar-item[data-view="${viewName}"]`);
+  if (activeItem) activeItem.classList.add('active');
+  // Clear sub-item active states
+  document.querySelectorAll('.sidebar-sub').forEach(el => el.classList.remove('active'));
+}
+
+function getDisplayTitle(a) {
+  if (a.id === 'lab11-array') return 'CP#2 — AnalyzeNumbers';
+  if (a.id === 'lab11-array-reverse') return 'CP#3 — ReverseArray';
+  if (a.id === 'lab12-matrix') return 'CP#2 — GradeMultipleChoice';
+  if (a.id === 'lab11-array-basic') return 'CP#1 — AnalyzeNumbers (Basic)';
+  if (a.id === 'lab12-matrix-basic') return 'CP#1 — PassTwoDimensionalArray';
+  return a.title;
+}
+
+function renderSidebarTasks() {
+  const container = document.getElementById('sidebarTasks');
+  if (!container) return;
+
+  const groups = {
+    'Lab 5: If/Else': [],
+    'Lab 11: Array': [],
+    'Lab 12: Matrix': []
+  };
+
+  assignmentsData.forEach(a => {
+    if (a.id.startsWith('checkpoint')) groups['Lab 5: If/Else'].push(a);
+    else if (a.id.startsWith('lab11')) groups['Lab 11: Array'].push(a);
+    else if (a.id.startsWith('lab12')) groups['Lab 12: Matrix'].push(a);
+  });
+
+  let html = '';
+  for (const [groupName, list] of Object.entries(groups)) {
+    if (list.length === 0) continue;
+    list.sort((x, y) => {
+      const getOrder = item => {
+        if (item.id.includes('basic')) return 1;
+        if (item.id === 'lab11-array') return 2;
+        if (item.id === 'lab11-array-reverse') return 3;
+        return 2;
+      };
+      return getOrder(x) - getOrder(y);
+    });
+    list.forEach(a => {
+      const shortName = a.className;
+      html += `<div class="sidebar-section">${shortName}</div>`;
+      html += `<div class="sidebar-sub" onclick="showStatement('${a.id}')">📄 Statement</div>`;
+      html += `<div class="sidebar-sub" onclick="showSubmissions('${a.id}')">📮 Submissions</div>`;
+    });
+  }
+  container.innerHTML = html;
+}
+
+function showStatement(assignmentId) {
+  const a = assignmentsData.find(x => x.id === assignmentId);
+  if (!a) return;
+
+  // Switch to statement view
+  document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+  document.getElementById('view-statement').classList.add('active');
+
+  // Clear top-level sidebar active
+  document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.sidebar-sub').forEach(el => el.classList.remove('active'));
+  // Highlight clicked sub item
+  event.target.classList.add('active');
+
+  const displayTitle = getDisplayTitle(a);
+  document.getElementById('statementPanelHead').textContent = `📄 ${displayTitle} — Statement`;
+
+  const timeLimit = (a.timeLimitSec ?? 5.0).toFixed(3);
+  const memoryLimit = (a.memoryLimitMb ?? 128).toFixed(2);
+
+  document.getElementById('statementBody').innerHTML = `
+    <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 8px;">${a.title}</h3>
+    <p style="font-size: 11px; color: var(--muted); margin-bottom: 16px;">Task ID: <code style="font-family: 'JetBrains Mono', monospace;">${a.id}</code></p>
+
+    <div style="margin-bottom: 20px;">
+      <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 10px;">Statement</h4>
+      <div class="problem" style="margin: 0;">${a.problemStatement}</div>
+    </div>
+
+    <div>
+      <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 10px;">Some details</h4>
+      <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 10px 14px; font-weight: 600; width: 180px; color: var(--muted);">Type</td>
+          <td style="padding: 10px 14px;">Batch</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 10px 14px; font-weight: 600; color: var(--muted);">Time limit</td>
+          <td style="padding: 10px 14px;">${timeLimit} seconds</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 10px 14px; font-weight: 600; color: var(--muted);">Memory limit</td>
+          <td style="padding: 10px 14px;">${memoryLimit} MiB</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 10px 14px; font-weight: 600; color: var(--muted);">Compilation</td>
+          <td style="padding: 10px 14px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent-light);">javac ${a.className}.java</td>
+        </tr>
+        <tr>
+          <td style="padding: 10px 14px; font-weight: 600; color: var(--muted);">Execution</td>
+          <td style="padding: 10px 14px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent-light);">java ${a.className}</td>
+        </tr>
+      </table>
+    </div>
+  `;
+}
+
+function showSubmissions(assignmentId) {
+  const a = assignmentsData.find(x => x.id === assignmentId);
+  if (!a) return;
+
+  // Set the dropdown and load the assignment
+  assignmentSelect.value = assignmentId;
+  updateProblem();
+
+  // Switch to submissions view
+  document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+  document.getElementById('view-submissions').classList.add('active');
+
+  // Clear top-level sidebar active
+  document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.sidebar-sub').forEach(el => el.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+async function loadAssignments() {
+  const res = await fetch('/api/assignments');
+  assignmentsData = await res.json();
+  renderAssignments();
+  renderSidebarTasks();
+}
+
+// Light/Dark Mode Logic
+themeToggle.addEventListener('click', () => {
+  document.body.classList.toggle('light-theme');
+  const isLight = document.body.classList.contains('light-theme');
+  localStorage.setItem('theme', isLight ? 'light' : 'dark');
+  if (isLight) {
+    themeIcon.innerHTML = `
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    `;
+  } else {
+    themeIcon.innerHTML = `
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+    `;
+  }
+});
+if (localStorage.getItem('theme') === 'light') {
+  themeToggle.click();
+}
+
+const starterTemplates = {
+  'checkpoint1-salary': `import java.util.Scanner;
+
+public class Salary {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        
+        // TODO: Read input, calculate the weekly salary, and print it.
+        // DO NOT change the class name "Salary"!
+        
+    }
+}`,
+  'checkpoint2-compare': `import java.util.Scanner;
+
+public class CompareNumbers {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        
+        // TODO: Read two numbers, compare them, and print the correct result.
+        // DO NOT change the class name "CompareNumbers"!
+        
+    }
+}`,
+  'checkpoint3-temperature': `import java.util.Scanner;
+
+public class TempConvert {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        
+        // TODO: Read 'c' or 'f' and a temperature, then convert and print.
+        // DO NOT change the class name "TempConvert"!
+        
+    }
+}`,
+  'lab11-array-basic': `import java.util.Scanner;
+
+public class AnalyzeNumbersBasic {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        
+        // TODO: Read N, read N numbers, and compute sum, average, max, and min.
+        // DO NOT change the class name "AnalyzeNumbersBasic"!
+        
+    }
+}`,
+  'lab11-array': `import java.util.Scanner;
+
+public class AnalyzeNumbers {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        
+        // TODO: Complete the main method to read N numbers and compute the logic.
+        
+    }
+    
+    public static void printArray(double[] array) {
+        // TODO: Implement this method
+    }
+    
+    public static double findMax(double[] array) {
+        // TODO: Implement this method
+        return 0;
+    }
+    
+    public static double findMin(double[] array) {
+        // TODO: Implement this method
+        return 0;
+    }
+}`,
+  'lab11-array-reverse': `import java.util.Scanner;
+
+public class ReverseArray {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        
+        // TODO: Read N, read N double values into an array, reverse the array using reverse(), and print elements.
+        // DO NOT change the class name "ReverseArray"!
+        
+    }
+    
+    public static void reverse(double[] list) {
+        // TODO: Implement the reverse method
+    }
+}`,
+  'lab12-matrix-basic': `import java.util.Scanner;
+
+public class PassTwoDimensionalArray {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        // TODO: Create a 3x4 array, read input, print matrix, and print sum.
+    }
+    
+    public static void printMatrix(int[][] m) {
+        // TODO: Implement this method
+    }
+    
+    public static int sum(int[][] m) {
+        // TODO: Implement this method
+        return 0;
+    }
+}`,
+  'lab12-matrix': `public class GradeMultipleChoice {
+    public static void main(String[] args) {
+        char[][] answers = {
+            {'A', 'B', 'A', 'C', 'C', 'D', 'E', 'E', 'A', 'D'},
+            {'D', 'B', 'A', 'B', 'C', 'A', 'E', 'E', 'A', 'D'},
+            {'E', 'D', 'D', 'A', 'C', 'B', 'E', 'E', 'A', 'D'},
+            {'C', 'B', 'A', 'E', 'D', 'C', 'E', 'E', 'A', 'D'},
+            {'A', 'B', 'D', 'C', 'C', 'D', 'E', 'E', 'A', 'D'},
+            {'B', 'B', 'E', 'C', 'C', 'D', 'E', 'E', 'A', 'D'},
+            {'B', 'B', 'A', 'C', 'C', 'D', 'E', 'E', 'A', 'D'},
+            {'E', 'B', 'E', 'C', 'C', 'D', 'E', 'E', 'A', 'D'}
+        };
+        
+        char[] keys = {'D', 'B', 'D', 'C', 'C', 'D', 'A', 'E', 'A', 'D'};
+        
+        // TODO: Grade the answers and print the correct score for each student
+        
+    }
+}`
+};
+
+async function loadAssignments() {
+  const res = await fetch('/api/assignments');
+  assignmentsData = await res.json();
+  renderAssignments();
+}
+
+function renderAssignments() {
+  const groups = {
+    'Lab 5: If/Else Statement': [],
+    'Lab 11: Single Dimension Array': [],
+    'Lab 12: Multidimensional Array': []
+  };
+  
+  assignmentsData.forEach(a => {
+    if (a.id.startsWith('checkpoint')) {
+      groups['Lab 5: If/Else Statement'].push(a);
+    } else if (a.id.startsWith('lab11-array')) {
+      groups['Lab 11: Single Dimension Array'].push(a);
+    } else if (a.id.startsWith('lab12-matrix')) {
+      groups['Lab 12: Multidimensional Array'].push(a);
+    }
+  });
+
+  let html = '';
+  for (const [groupName, list] of Object.entries(groups)) {
+    if (list.length > 0) {
+      // Sort assignments: make basic (Checkpoint #1) always first
+      list.sort((x, y) => {
+        const getOrder = item => {
+          if (item.id.includes('basic')) return 1;
+          if (item.id === 'lab11-array') return 2;
+          if (item.id === 'lab11-array-reverse') return 3;
+          return 2;
+        };
+        return getOrder(x) - getOrder(y);
+      });
+
+      html += `<optgroup label="${groupName}">`;
+      html += list.map(a => {
+        let displayTitle = a.title;
+        if (a.id === 'lab11-array') {
+          displayTitle = 'Checkpoint #2 — AnalyzeNumbers';
+        } else if (a.id === 'lab11-array-reverse') {
+          displayTitle = 'Checkpoint #3 — ReverseArray';
+        } else if (a.id === 'lab12-matrix') {
+          displayTitle = 'Checkpoint #2 — GradeMultipleChoice';
+        } else if (a.id === 'lab11-array-basic') {
+          displayTitle = 'Checkpoint #1 — AnalyzeNumbers (Basic)';
+        } else if (a.id === 'lab12-matrix-basic') {
+          displayTitle = 'Checkpoint #1 — PassTwoDimensionalArray';
+        }
+        return `<option value="${a.id}">${displayTitle}</option>`;
+      }).join('');
+      html += `</optgroup>`;
+    }
+  }
+  assignmentSelect.innerHTML = html;
+  updateProblem();
+}
+
+let countdownInterval = null;
+let submissionsHistoryData = [];
+
+function renderOverviewTable() {
+  const tbody = document.getElementById('overviewTableBody');
+  if (!tbody || assignmentsData.length === 0) return;
+
+  const bestScores = {};
+  submissionsHistoryData.forEach(s => {
+    const currentBest = bestScores[s.assignmentId] ?? 0;
+    if (s.percentage > currentBest) {
+      bestScores[s.assignmentId] = s.percentage;
+    }
+  });
+
+  const selectedId = assignmentSelect.value;
+
+  const groups = {
+    'Lab 5: If/Else Statement': [],
+    'Lab 11: Single Dimension Array': [],
+    'Lab 12: Multidimensional Array': []
+  };
+
+  assignmentsData.forEach(a => {
+    if (a.id.startsWith('checkpoint')) {
+      groups['Lab 5: If/Else Statement'].push(a);
+    } else if (a.id.startsWith('lab11-array') || a.id.startsWith('lab11')) {
+      groups['Lab 11: Single Dimension Array'].push(a);
+    } else if (a.id.startsWith('lab12-matrix') || a.id.startsWith('lab12')) {
+      groups['Lab 12: Multidimensional Array'].push(a);
+    }
+  });
+
+  let html = '';
+  for (const [groupName, list] of Object.entries(groups)) {
+    if (list.length === 0) continue;
+    
+    // Sort assignments: make basic (Checkpoint #1) always first
+    list.sort((x, y) => {
+      const scoreX = x.id.includes('basic') ? 1 : 2;
+      const scoreY = y.id.includes('basic') ? 1 : 2;
+      return scoreX - scoreY;
+    });
+
+    // Group Header Row
+    html += `
+      <tr class="group-header-row" style="background: rgba(99, 102, 241, 0.05); font-weight: 700; border-bottom: 2px solid var(--border); pointer-events: none;">
+        <td colspan="7" style="padding: 14px 16px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent-light);">
+          📂 ${groupName}
+        </td>
+      </tr>
+    `;
+
+    html += list.map(a => {
+      const scorePct = bestScores[a.id] ?? 0;
+      let badgeClass = 'zero';
+      if (scorePct >= 100) badgeClass = 'full';
+      else if (scorePct > 0) badgeClass = 'partial';
+
+      let displayTitle = a.title;
+      if (a.id === 'lab11-array') displayTitle = 'Checkpoint #2 — AnalyzeNumbers';
+      else if (a.id === 'lab12-matrix') displayTitle = 'Checkpoint #2 — GradeMultipleChoice';
+      else if (a.id === 'lab11-array-basic') displayTitle = 'Checkpoint #1 — AnalyzeNumbers (Basic)';
+      else if (a.id === 'lab12-matrix-basic') displayTitle = 'Checkpoint #1 — PassTwoDimensionalArray';
+
+      const isActive = a.id === selectedId ? 'active-task' : '';
+      const timeLimit = (a.timeLimitSec ?? 5.0).toFixed(3) + 's';
+      const memoryLimit = (a.memoryLimitMb ?? 128).toFixed(2) + ' MiB';
+
+      return `
+        <tr class="task-row ${isActive}" data-id="${a.id}" onclick="selectTaskFromTable('${a.id}')">
+          <td style="padding-left: 24px;"><span class="score-badge ${badgeClass}">${scorePct} / 100</span></td>
+          <td style="font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600;">${a.id}</td>
+          <td style="font-weight: 600;">${displayTitle}</td>
+          <td style="color: var(--muted); font-size: 12px;">${timeLimit}</td>
+          <td style="color: var(--muted); font-size: 12px;">${memoryLimit}</td>
+          <td><span class="badge" style="background: rgba(99,102,241,0.15); color: var(--accent-light);">Batch</span></td>
+          <td style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted);">[${a.className}.java]</td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  tbody.innerHTML = html;
+}
+
+function selectTaskFromTable(id) {
+  assignmentSelect.value = id;
+  updateProblem();
+  // Switch to submissions view
+  document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+  document.getElementById('view-submissions').classList.add('active');
+  document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.sidebar-sub').forEach(el => el.classList.remove('active'));
+}
+
+function startServerTimeClock() {
+  const serverTimeEl = document.getElementById('sidebarServerTime');
+  if (!serverTimeEl) return;
+
+  function tick() {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    serverTimeEl.textContent = `${hours}:${minutes}:${seconds}`;
+  }
+  tick();
+  setInterval(tick, 1000);
+}
+
+function updateCountdown(deadlineStr) {
+  if (countdownInterval) {
+    clearInterval(countdownInterval);
+    countdownInterval = null;
+  }
+
+  const countdownEl = document.getElementById('countdownTimer');
+  const sidebarTimeLeftEl = document.getElementById('sidebarTimeLeft');
+
+  if (!deadlineStr) {
+    if (countdownEl) countdownEl.textContent = 'No deadline';
+    if (sidebarTimeLeftEl) sidebarTimeLeftEl.textContent = 'No deadline';
+    return;
+  }
+
+  const targetDate = new Date(deadlineStr).getTime();
+
+  function tick() {
+    const now = new Date().getTime();
+    const diff = targetDate - now;
+
+    if (diff <= 0) {
+      const expiredVal = '00:00:00 (Expired)';
+      if (countdownEl) {
+        countdownEl.textContent = expiredVal;
+        countdownEl.style.color = 'var(--bad)';
+      }
+      if (sidebarTimeLeftEl) {
+        sidebarTimeLeftEl.textContent = expiredVal;
+        sidebarTimeLeftEl.style.color = 'var(--bad)';
+      }
+      return;
+    }
+
+    const totalSec = Math.floor(diff / 1000);
+    const hours = Math.floor(totalSec / 3600);
+    const mins = Math.floor((totalSec % 3600) / 60);
+    const secs = totalSec % 60;
+
+    const pad = (n) => String(n).padStart(2, '0');
+    const formatted = `${hours}:${pad(mins)}:${pad(secs)}`;
+
+    if (countdownEl) {
+      countdownEl.textContent = formatted;
+      countdownEl.style.color = 'var(--accent-light)';
+    }
+    if (sidebarTimeLeftEl) {
+      sidebarTimeLeftEl.textContent = formatted;
+      sidebarTimeLeftEl.style.color = 'var(--text)';
+    }
+  }
+
+  tick();
+  countdownInterval = setInterval(tick, 1000);
+}
+
+function updateProblem() {
+  const a = assignmentsData.find(x => x.id === assignmentSelect.value);
+  if (!a) return;
+  problemDiv.textContent = a.problemStatement + `\n\n(${a.testCases ? a.testCases.length : 'Multiple'} test cases total)`;
+  codeArea.value = starterTemplates[a.id] || '';
+  updateCountdown(a.deadline);
+  renderOverviewTable();
+  
+  // Clear/reset the grading results panel when switching task
+  if (resultsDiv) {
+    resultsDiv.innerHTML = 'Submit code to see grading results and AI feedback here.';
+    resultsDiv.className = 'empty';
+  }
+}
+
+async function loadHistory() {
+  try {
+    const res = await fetch('/api/submissions');
+    const data = await res.json();
+    submissionsHistoryData = data;
+    renderOverviewTable();
+    if (data.length === 0) {
+      historyList.innerHTML = `<div class="empty">No submissions logged yet.</div>`;
+      return;
+    }
+    historyList.innerHTML = data.map(sub => {
+      const time = new Date(sub.submittedAt).toLocaleTimeString();
+      const statusClass = sub.percentage >= 60 ? 'pass' : 'fail';
+      return `
+        <div class="sub-item">
+          <div class="sub-meta">
+            <strong>Student: ${sub.studentId}</strong>
+            <span class="sub-score ${statusClass}">${sub.percentage}%</span>
+          </div>
+          <div class="sub-meta">
+            <span>Assignment: ${sub.assignmentId.replace('checkpoint', 'CP ')}</span>
+            <span>${time}</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+  } catch (err) {
+    historyList.innerHTML = `<div class="empty" style="color:var(--bad)">Failed to load history</div>`;
+  }
+}
+
+assignmentSelect.addEventListener('change', updateProblem);
+refreshBtn.addEventListener('click', loadHistory);
+
+function tcHtml(tc) {
+  const cls = tc.passed ? 'pass' : 'fail';
+  const detail = `<div class="tc-detail"><b>Input:</b>\n${tc.stdin}\n\n<b>Expected Output:</b>\n${tc.expected}\n\n<b>Your Output:</b>\n${tc.actualStdout ?? '(none)'}${tc.errorType ? '\n\n<b>Error:</b> ' + tc.errorType : ''}</div>`;
+  
+  return `<div class="testcase ${cls}">
+    <div class="tc-head"><span>${tc.description}</span><span class="badge ${cls}">${tc.passed ? 'PASS' : 'FAIL'} · ${tc.weight}pt</span></div>
+    ${detail}
+  </div>`;
+}
+
+submitBtn.addEventListener('click', async () => {
+  submitBtn.disabled = true;
+  statusDiv.textContent = 'Compiling and running against test cases...';
+  resultsDiv.innerHTML = '';
+  try {
+    const res = await fetch('/api/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        assignmentId: assignmentSelect.value,
+        studentId: document.getElementById('studentId').value,
+        code: codeArea.value
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Grading failed');
+
+    const g = data.grading;
+    let html = '';
+
+    if (!g.compileSuccess) {
+      html += `<div class="score-box"><div class="score bad">Compile Error</div></div>
+        <div class="tc-detail" style="margin-top:8px;">${(g.compileError || '').replace(/</g,'&lt;')}</div>`;
+    } else {
+      const scoreClass = g.percentage >= 60 ? 'good' : 'bad';
+      html += `
+        <div class="score-box">
+          <div class="score ${scoreClass}">${g.rawScore} / ${g.maxScore}</div>
+          <div style="font-size: 14px; color: var(--muted); margin-top:4px;">Percentage: ${g.percentage}%</div>
+        </div>
+      `;
+      html += g.testCaseResults.map(tcHtml).join('');
+    }
+
+    if (data.aiFeedback) {
+      const f = data.aiFeedback;
+      html += `<div class="feedback-block">
+        <h3>AI Feedback ${f.source === 'mock' ? '<span class="mock-tag">MOCK — no Gemini API key</span>' : '<span class="mock-tag" style="color:var(--good); border-color:var(--good);">Gemini</span>'}</h3>
+        <p><strong>Strengths:</strong> ${f.strengths}</p>
+        <p><strong>Improvements:</strong><br>${f.improvements.replace(/\n/g,'<br>')}</p>
+        <p><strong>Overall:</strong> ${f.overall_feedback}</p>
+      </div>`;
+    } else if (g.compileSuccess) {
+      html += `<div class="feedback-block"><p style="color:var(--good)">All test cases passed — AI feedback skipped (Feature #5: no AI call needed when everything passes).</p></div>`;
+    }
+
+    resultsDiv.innerHTML = html;
+    statusDiv.textContent = '';
+    
+    // Auto-reload submission history
+    loadHistory();
+  } catch (err) {
+    statusDiv.textContent = 'Error: ' + err.message;
+  } finally {
+    submitBtn.disabled = false;
+  }
+});
+
+// Init
+loadAssignments();
+loadHistory();
+startServerTimeClock();
+</script>
+</body>
+</html>
