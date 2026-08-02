@@ -135,8 +135,15 @@ This project is an interactive multi-lab auto-grader ("AutoGrade Lab - Advanced 
     - `feature/ai-feedback`: Feature branch dedicated to Gemini AI Feedback service updates.
   - Successfully created and pushed all branches (`develop`, `feature/*`) to GitHub origin repository (`https://github.com/Kokokua/Autograde-lab.git`).
 
----
+### 20. Implemented Dual Submission Mode (Inline Editor + `.java` Drag & Drop)
+- **File**: `public/index.html`
+- **Action**:
+  - Implemented a dual-mode submission interface allowing students to switch between `📝 Live Editor` (LeetCode-style `<textarea>`) and `📎 Attach .java File` (CMS-style Drag & Drop zone).
+  - Added HTML5 `FileReader` API integration to automatically parse uploaded/dragged `.java` files client-side, populating the code payload seamlessly for `/api/submit`.
+  - Added drag-and-drop event listeners on both the dedicated dropzone AND directly on the editor textarea.
+  - Implemented file extension validation (`.java` only) and file size safety limit (max 500 KB).
 
+---
 
 ## Current Core Codebase Architecture Summary (Excluding `!my/`)
 

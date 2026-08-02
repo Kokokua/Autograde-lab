@@ -610,8 +610,30 @@
           </div>
 
           <div style="display: flex; flex-direction: column; flex-grow: 1;">
-            <label for="code">Java Source Code</label>
-            <textarea id="code" spellcheck="false" style="margin-top: 6px; flex-grow: 1;"></textarea>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 6px; margin-bottom: 6px;">
+              <label for="code" style="margin-bottom: 0;">Java Source Code</label>
+              <div class="submission-tabs" style="display: flex; gap: 4px; background: var(--bg); border: 1px solid var(--border); padding: 3px; border-radius: 8px;">
+                <button type="button" class="sub-tab active" id="tabEditor" onclick="switchSubMode('editor')" style="font-size: 11px; padding: 4px 10px; border-radius: 6px; border: none; background: var(--accent-light); color: #fff; cursor: pointer; font-weight: 600; transition: all 0.2s;">📝 Live Editor</button>
+                <button type="button" class="sub-tab" id="tabUpload" onclick="switchSubMode('upload')" style="font-size: 11px; padding: 4px 10px; border-radius: 6px; border: none; background: transparent; color: var(--muted); cursor: pointer; font-weight: 500; transition: all 0.2s;">📎 Attach .java File</button>
+              </div>
+            </div>
+
+            <!-- Mode 1: Editor -->
+            <div id="editorMode" style="display: flex; flex-direction: column; flex-grow: 1;">
+              <textarea id="code" spellcheck="false" style="flex-grow: 1; min-height: 220px;"></textarea>
+            </div>
+
+            <!-- Mode 2: Drag & Drop Zone -->
+            <div id="uploadMode" style="display: none; flex-direction: column; flex-grow: 1;">
+              <div id="dropzone" class="dropzone" style="border: 2px dashed var(--border); border-radius: 10px; padding: 24px 16px; text-align: center; background: var(--bg); cursor: pointer; transition: all 0.2s ease; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 220px;">
+                <div style="font-size: 32px; margin-bottom: 8px;">📁</div>
+                <div style="font-weight: 600; font-size: 13px; color: var(--text); margin-bottom: 4px;">Drag & drop your .java file here</div>
+                <div style="font-size: 12px; color: var(--muted); margin-bottom: 12px;">or click to browse files from your computer</div>
+                <input type="file" id="fileInput" accept=".java" style="display: none;" />
+                <button type="button" onclick="document.getElementById('fileInput').click();" style="font-size: 12px; padding: 6px 14px; background: var(--accent-light); color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Browse File</button>
+                <div id="fileInfo" style="margin-top: 12px; font-size: 12px; font-weight: 600; color: var(--green); display: none;"></div>
+              </div>
+            </div>
           </div>
 
           <button id="submitBtn">Submit for Grading</button>
@@ -831,8 +853,110 @@ function showSubmissions(assignmentId) {
   // Clear top-level sidebar active
   document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.sidebar-sub').forEach(el => el.classList.remove('active'));
-  event.target.classList.add('active');
 }
+
+// Dual Submission Mode Switching & File Reader
+function switchSubMode(mode) {
+  const tabEditor = document.getElementById('tabEditor');
+  const tabUpload = document.getElementById('tabUpload');
+  const editorMode = document.getElementById('editorMode');
+  const uploadMode = document.getElementById('uploadMode');
+
+  if (mode === 'editor') {
+    tabEditor.style.background = 'var(--accent-light)';
+    tabEditor.style.color = '#fff';
+    tabEditor.style.fontWeight = '600';
+    tabUpload.style.background = 'transparent';
+    tabUpload.style.color = 'var(--muted)';
+    tabUpload.style.fontWeight = '500';
+    editorMode.style.display = 'flex';
+    uploadMode.style.display = 'none';
+  } else {
+    tabUpload.style.background = 'var(--accent-light)';
+    tabUpload.style.color = '#fff';
+    tabUpload.style.fontWeight = '600';
+    tabEditor.style.background = 'transparent';
+    tabEditor.style.color = 'var(--muted)';
+    tabEditor.style.fontWeight = '500';
+    uploadMode.style.display = 'flex';
+    editorMode.style.display = 'none';
+  }
+}
+
+function processJavaFile(file) {
+  if (!file) return;
+  if (!file.name.endsWith('.java')) {
+    alert('Invalid file format. Please upload a .java file.');
+    return;
+  }
+  if (file.size > 500 * 1024) {
+    alert('File is too large. Maximum allowed size is 500 KB.');
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const content = e.target.result;
+    document.getElementById('code').value = content;
+    const fileInfo = document.getElementById('fileInfo');
+    fileInfo.style.display = 'block';
+    fileInfo.innerHTML = `✓ Attached: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+  };
+  reader.readAsText(file);
+}
+
+// Attach Drag & Drop Listeners
+document.addEventListener('DOMContentLoaded', () => {
+  const dropzone = document.getElementById('dropzone');
+  const fileInput = document.getElementById('fileInput');
+  const codeArea = document.getElementById('code');
+
+  if (fileInput) {
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        processJavaFile(e.target.files[0]);
+      }
+    });
+  }
+
+  if (dropzone) {
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropzone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.style.borderColor = 'var(--accent-light)';
+        dropzone.style.background = 'rgba(99, 102, 241, 0.08)';
+      });
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropzone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.style.borderColor = 'var(--border)';
+        dropzone.style.background = 'var(--bg)';
+      });
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        processJavaFile(files[0]);
+      }
+    });
+  }
+
+  // Also support dragging directly onto the editor textarea
+  if (codeArea) {
+    codeArea.addEventListener('drop', (e) => {
+      const files = e.dataTransfer.files;
+      if (files.length > 0 && files[0].name.endsWith('.java')) {
+        e.preventDefault();
+        processJavaFile(files[0]);
+      }
+    });
+  }
+});
 
 async function loadAssignments() {
   const res = await fetch('/api/assignments');
