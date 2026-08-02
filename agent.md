@@ -123,14 +123,20 @@ This project is an interactive multi-lab auto-grader ("AutoGrade Lab - Advanced 
   - Added test cases (`tc1` for integer reversal, `tc2` for decimal reversal).
   - Configured starter code template in `public/index.html` and updated `getDisplayTitle`, dropdown rendering, and sidebar sorting to properly display all 3 Checkpoints for Lab 11 (`CP#1 — AnalyzeNumbers (Basic)`, `CP#2 — AnalyzeNumbers`, and `CP#3 — ReverseArray`).
 
-### 18. Configured Auto-Reload / Hot-Reloading (`npx tsx watch`)
-- **File**: `package.json`
+### 19. Git Repository Audit & Branching Strategy Setup
+- **File**: `.gitignore`, `agent.md`, Git Branches
 - **Action**:
-  - Upgraded the `"dev"` script from `"tsc && node dist/server.js"` to `"npx tsx watch src/server.ts"`.
-  - Added `tsx` to `devDependencies`.
-  - Enables instant automatic server restarting whenever TypeScript code in `src/` is modified, eliminating the need to manually `Ctrl + C` and rebuild.
+  - Performed a comprehensive Git tracking audit confirming safe exclusion of `node_modules/`, `dist/`, `!my/`, `.env`, `*.log`, and system junk files (`.DS_Store`).
+  - Established standard Git Workflow & Branching Strategy:
+    - `main`: Stable production releases.
+    - `develop`: Integration & staging branch for features.
+    - `feature/ui-enhancements`: Feature branch dedicated to frontend UI & CMS layout upgrades.
+    - `feature/grading-system`: Feature branch dedicated to Java grading engine & assignment configuration.
+    - `feature/ai-feedback`: Feature branch dedicated to Gemini AI Feedback service updates.
+  - Successfully created and pushed all branches (`develop`, `feature/*`) to GitHub origin repository (`https://github.com/Kokokua/Autograde-lab.git`).
 
 ---
+
 
 ## Current Core Codebase Architecture Summary (Excluding `!my/`)
 
