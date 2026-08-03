@@ -25,6 +25,7 @@ export interface Assignment {
   deadline?: string;
   problemStatement: string;
   className: string;      // required public class name, e.g. "TestScore"
+  pdfUrl?: string;        // URL to the original lab PDF file
   testCases: TestCase[];
   instructorContextFlags: string[]; // e.g. ["Explain using simple language for a beginner"]
 }

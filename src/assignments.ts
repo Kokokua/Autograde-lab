@@ -11,6 +11,7 @@ export const assignments: Assignment[] = [
     title: "Checkpoint #1 — Weekly Salary Calculator",
     deadline: "2026-08-21T23:59:59",
     className: "Salary",
+    pdfUrl: "/pdf/lab5-if-else.pdf",
     problemStatement:
       "Write a Java program to compute and display a person's weekly salary. " +
       "If hours worked <= 40, pay is $8.00/hour. If hours worked > 40, pay is " +
@@ -68,6 +69,7 @@ export const assignments: Assignment[] = [
     title: "Checkpoint #2 — Compare Two Numbers",
     deadline: "2026-08-21T23:59:59",
     className: "CompareNumbers",
+    pdfUrl: "/pdf/lab5-if-else.pdf",
     problemStatement:
       "Ask the user to input two numbers using Scanner. If the first number is " +
       "greater than the second, print: 'The first number is greater than the " +
@@ -112,6 +114,7 @@ export const assignments: Assignment[] = [
     title: "Checkpoint #3 — Temperature Converter (console version)",
     deadline: "2026-08-21T23:59:59",
     className: "TempConvert",
+    pdfUrl: "/pdf/lab5-if-else.pdf",
     problemStatement:
       "Read a single letter from input: 'c' means convert Fahrenheit to " +
       "Celsius using C = (F - 32) * 5 / 9. 'f' means convert Celsius to " +
@@ -170,6 +173,7 @@ export const assignments: Assignment[] = [
     title: "Lab 11 — Single Dimension Array (AnalyzeNumbers)",
     deadline: "2026-08-28T23:59:59",
     className: "AnalyzeNumbers",
+    pdfUrl: "/pdf/lab11-single-dimension-array.pdf",
     problemStatement:
       "Write a Java program to analyze a list of numbers. " +
       "First, read the number of elements (N) from standard input. Then, read N double values. " +
@@ -215,6 +219,7 @@ export const assignments: Assignment[] = [
     title: "Lab 11 Checkpoint #3 — Reverse Array (ReverseArray)",
     deadline: "2026-08-28T23:59:59",
     className: "ReverseArray",
+    pdfUrl: "/pdf/lab11-single-dimension-array.pdf",
     problemStatement:
       "Write a Java program to reverse an array of numbers. " +
       "First, read the number of elements (N) from standard input, followed by N double values. " +
@@ -250,6 +255,7 @@ export const assignments: Assignment[] = [
     title: "Lab 12 — Multidimensional Array (GradeMultipleChoice)",
     deadline: "2026-09-04T23:59:59",
     className: "GradeMultipleChoice",
+    pdfUrl: "/pdf/lab12-multidimension-array.pdf",
     problemStatement:
       "Write a Java program to grade multiple choice test sheets for 8 students. " +
       "The student answers are represented as an 8x10 two-dimensional character array. " +
@@ -285,6 +291,7 @@ export const assignments: Assignment[] = [
     title: "Lab 11 Checkpoint #1 — AnalyzeNumbers (Basic)",
     deadline: "2026-08-28T23:59:59",
     className: "AnalyzeNumbersBasic",
+    pdfUrl: "/pdf/lab11-single-dimension-array.pdf",
     problemStatement:
       "Write a Java program to analyze a list of numbers in the main method. " +
       "First, read the number of elements (N) from standard input. Then, read N double values. " +
@@ -320,6 +327,7 @@ export const assignments: Assignment[] = [
     title: "Lab 12 Checkpoint #1 — PassTwoDimensionalArray",
     deadline: "2026-09-04T23:59:59",
     className: "PassTwoDimensionalArray",
+    pdfUrl: "/pdf/lab12-multidimension-array.pdf",
     problemStatement:
       "Write a Java program to create a 3-by-4 two-dimensional integer array. " +
       "Read 12 integers from standard input into the array, print all values in grid format, " +

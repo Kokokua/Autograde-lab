@@ -934,15 +934,26 @@ function showStatement(assignmentId) {
     `;
   }
 
+  const pdfButtonsHtml = `
+    <div style="display: flex; gap: 8px; align-items: center;">
+      ${a.pdfUrl ? `
+        <a href="${a.pdfUrl}" target="_blank" download style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; font-size: 12px; font-weight: 600; color: #fff; background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%); border-radius: 8px; text-decoration: none; transition: opacity 0.2s;">
+          📄 Original Lab PDF
+        </a>
+      ` : ''}
+      <button type="button" onclick="downloadAssignmentPDF('${a.id}')" style="display: flex; align-items: center; gap: 6px; padding: 8px 16px; font-size: 12px; background: linear-gradient(135deg, #059669 0%, #10b981 100%);">
+        <span>📥 Print / Export PDF</span>
+      </button>
+    </div>
+  `;
+
   document.getElementById('statementBody').innerHTML = `
     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
       <div>
         <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 4px;">${a.title}</h3>
         <p style="font-size: 11px; color: var(--muted);">Task ID: <code style="font-family: 'JetBrains Mono', monospace;">${a.id}</code></p>
       </div>
-      <button type="button" onclick="downloadAssignmentPDF('${a.id}')" style="display: flex; align-items: center; gap: 6px; padding: 8px 16px; font-size: 12px; background: linear-gradient(135deg, #059669 0%, #10b981 100%);">
-        <span>📥 Download PDF Statement</span>
-      </button>
+      ${pdfButtonsHtml}
     </div>
 
     <div style="margin-bottom: 20px;">
@@ -1501,9 +1512,16 @@ function updateProblem() {
         <strong style="font-size: 14px; color: var(--text);">${a.title}</strong>
         <div style="font-size: 11px; color: var(--muted); margin-top: 2px;">Class: <code style="font-family: 'JetBrains Mono', monospace;">${a.className}.java</code></div>
       </div>
-      <button type="button" onclick="downloadAssignmentPDF('${a.id}')" style="padding: 5px 12px; font-size: 11px; background: linear-gradient(135deg, #059669 0%, #10b981 100%); display: flex; align-items: center; gap: 4px;">
-        <span>📥 Download PDF</span>
-      </button>
+      <div style="display: flex; gap: 6px; align-items: center;">
+        ${a.pdfUrl ? `
+          <a href="${a.pdfUrl}" target="_blank" download style="padding: 5px 12px; font-size: 11px; font-weight: 600; color: #fff; background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%); border-radius: 6px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+            📄 Original PDF
+          </a>
+        ` : ''}
+        <button type="button" onclick="downloadAssignmentPDF('${a.id}')" style="padding: 5px 12px; font-size: 11px; background: linear-gradient(135deg, #059669 0%, #10b981 100%); display: flex; align-items: center; gap: 4px;">
+          <span>📥 Export PDF</span>
+        </button>
+      </div>
     </div>
     <div style="line-height: 1.6;">${a.problemStatement}</div>
     ${tcListText ? `

@@ -26,6 +26,7 @@ app.get("/api/assignments", (_req, res) => {
       deadline: a.deadline,
       problemStatement: a.problemStatement,
       className: a.className,
+      pdfUrl: a.pdfUrl,
       // only show non-hidden test cases to the "student" side of the API
       visibleTestCases: a.testCases
         .filter((t) => !t.hidden)
